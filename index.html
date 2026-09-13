@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.2.4.2 (Windows)"/>
+	<meta name="created" content="2026-09-13T16:15:25.554749200"/>
+	<meta name="changed" content="2026-09-13T16:15:43.286983300"/>
+</head>
+<body lang="en-US" dir="ltr"><p>&lt;!DOCTYPE html&gt;<br/>
+&lt;html
+lang=&quot;en&quot;&gt;<br/>
+&lt;head&gt;<br/>
+    &lt;meta
+charset=&quot;UTF-8&quot;&gt;<br/>
+    &lt;meta name=&quot;viewport&quot;
+content=&quot;width=device-width, initial-scale=1.0,
+user-scalable=no&quot;&gt;<br/>
+    &lt;title&gt;Life
+Simulator&lt;/title&gt;<br/>
+    &lt;style&gt;<br/>
+        :root {<br/>
+
+           --bg-color: #0f172a;<br/>
+            --panel-bg:
+#1e293b;<br/>
+            --accent: #3b82f6;<br/>
+            --text:
+#f8fafc;<br/>
+            --text-muted: #94a3b8;<br/>
+           
+--health-color: #ef4444;<br/>
+            --happy-color: #eab308;<br/>
+
+           --smarts-color: #a855f7;<br/>
+            --wealth-color:
+#22c55e;<br/>
+        }<br/>
+<br/>
+        * { box-sizing:
+border-box; margin: 0; padding: 0; font-family: -apple-system,
+BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Helvetica, Arial,
+sans-serif; user-select: none; }<br/>
+        body {
+background-color: var(--bg-color); color: var(--text); display: flex;
+justify-content: center; min-height: 100vh; padding: 12px; }<br/>
+   
+    #app { width: 100%; max-width: 480px; display: flex;
+flex-direction: column; gap: 12px; height: 100vh; max-height: 900px;
+}<br/>
+<br/>
+        /* Header &amp; Character Card */<br/>
+       
+.character-card { background: var(--panel-bg); padding: 16px;
+border-radius: 16px; display: flex; gap: 16px; align-items: center;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }<br/>
+       
+.avatar-box { width: 80px; height: 80px; background: #334155;
+border-radius: 50%; display: flex; align-items: center;
+justify-content: center; font-size: 2.5rem; border: 3px solid
+var(--accent); position: relative; overflow: hidden; }<br/>
+       
+.avatar-emoji { animation: float 3s infinite ease-in-out; }<br/>
+    
+   @keyframes float { 0%, 100% { transform: translateY(0); } 50% {
+transform: translateY(-4px); } }<br/>
+<br/>
+        .char-info {
+flex: 1; }<br/>
+        .char-name { font-size: 1.25rem; font-weight:
+700; margin-bottom: 2px; }<br/>
+        .char-sub { font-size:
+0.85rem; color: var(--text-muted); margin-bottom: 6px; }<br/>
+       
+.bank-val { font-size: 1.1rem; font-weight: 700; color:
+var(--wealth-color); }<br/>
+<br/>
+        /* Stats Grid */<br/>
+     
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap:
+8px; background: var(--panel-bg); padding: 12px; border-radius: 12px;
+}<br/>
+        .stat-item { display: flex; flex-direction: column;
+gap: 4px; }<br/>
+        .stat-header { display: flex;
+justify-content: space-between; font-size: 0.75rem; color:
+var(--text-muted); font-weight: 600; }<br/>
+        .bar-bg { height:
+8px; background: #334155; border-radius: 4px; overflow: hidden; }<br/>
+
+       .bar-fill { height: 100%; transition: width 0.3s ease;
+border-radius: 4px; }<br/>
+<br/>
+        /* Feed &amp; Log */<br/>
+  
+     .feed-container { flex: 1; background: var(--panel-bg);
+border-radius: 12px; padding: 12px; overflow-y: auto; display: flex;
+flex-direction: column; gap: 8px; }<br/>
+        .log-entry {
+font-size: 0.85rem; line-height: 1.3; padding: 8px; background:
+#0f172a55; border-left: 3px solid var(--accent); border-radius: 4px;
+}<br/>
+        .log-entry.age-up { border-color: #f59e0b;
+font-weight: 600; }<br/>
+<br/>
+        /* Action Buttons &amp; Age
+Engine */<br/>
+        .action-panel { display: flex; flex-direction:
+column; gap: 8px; }<br/>
+        .btn { border: none; padding: 14px;
+border-radius: 12px; font-weight: 700; font-size: 1rem; color: white;
+background: var(--accent); cursor: pointer; transition: transform
+0.1s; }<br/>
+        .btn:active { transform: scale(0.98); }<br/>
+   
+    .btn-age { background: linear-gradient(135deg, #f59e0b, #d97706);
+font-size: 1.2rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}<br/>
+<br/>
+        /* Modal Choice Overlay */<br/>
+       
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0,
+0.8); display: flex; align-items: center; justify-content: center;
+padding: 16px; z-index: 100; opacity: 0; pointer-events: none;
+transition: opacity 0.2s ease; }<br/>
+        .modal-overlay.active {
+opacity: 1; pointer-events: auto; }<br/>
+        .modal { background:
+var(--panel-bg); width: 100%; max-width: 400px; border-radius: 16px;
+padding: 20px; display: flex; flex-direction: column; gap: 16px;
+border: 1px solid #334155; }<br/>
+        .modal-title { font-size:
+1.1rem; font-weight: 700; }<br/>
+        .modal-desc { font-size:
+0.9rem; color: var(--text-muted); line-height: 1.4; }<br/>
+       
+.modal-opts { display: flex; flex-direction: column; gap: 8px; }<br/>
+
+       .opt-btn { background: #334155; color: white; border: none;
+padding: 12px; border-radius: 8px; font-weight: 600; text-align:
+left; cursor: pointer; }<br/>
+        .opt-btn:hover { background:
+var(--accent); }<br/>
+    &lt;/style&gt;<br/>
+&lt;/head&gt;<br/>
+&lt;body&gt;<br/>
+
+   &lt;div id=&quot;app&quot;&gt;<br/>
+        &lt;!-- Character
+Summary --&gt;<br/>
+        &lt;div class=&quot;character-card&quot;&gt;<br/>
+
+           &lt;div class=&quot;avatar-box&quot;&gt;<br/>
+            
+   &lt;span id=&quot;avatar&quot; class=&quot;avatar-emoji&quot;&gt;👶&lt;/span&gt;<br/>
+
+           &lt;/div&gt;<br/>
+            &lt;div class=&quot;char-info&quot;&gt;<br/>
+
+               &lt;div id=&quot;charName&quot; class=&quot;char-name&quot;&gt;Alex
+Smith&lt;/div&gt;<br/>
+                &lt;div id=&quot;charSub&quot;
+class=&quot;char-sub&quot;&gt;Age 0 • Baby&lt;/div&gt;<br/>
+       
+        &lt;div id=&quot;charBank&quot; class=&quot;bank-val&quot;&gt;$0&lt;/div&gt;<br/>
+
+           &lt;/div&gt;<br/>
+        &lt;/div&gt;<br/>
+<br/>
+       
+&lt;!-- Life Stats --&gt;<br/>
+        &lt;div class=&quot;stats-grid&quot;&gt;<br/>
+
+           &lt;div class=&quot;stat-item&quot;&gt;<br/>
+             
+  &lt;div class=&quot;stat-header&quot;&gt;&lt;span&gt;HEALTH&lt;/span&gt;&lt;span
+id=&quot;healthVal&quot;&gt;100%&lt;/span&gt;&lt;/div&gt;<br/>
+      
+         &lt;div class=&quot;bar-bg&quot;&gt;&lt;div id=&quot;healthBar&quot;
+class=&quot;bar-fill&quot; style=&quot;width: 100%; background:
+var(--health-color);&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br/>
+         
+  &lt;/div&gt;<br/>
+            &lt;div class=&quot;stat-item&quot;&gt;<br/>
+
+               &lt;div
+class=&quot;stat-header&quot;&gt;&lt;span&gt;HAPPINESS&lt;/span&gt;&lt;span
+id=&quot;happyVal&quot;&gt;100%&lt;/span&gt;&lt;/div&gt;<br/>
+       
+        &lt;div class=&quot;bar-bg&quot;&gt;&lt;div id=&quot;happyBar&quot;
+class=&quot;bar-fill&quot; style=&quot;width: 100%; background:
+var(--happy-color);&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br/>
+          
+ &lt;/div&gt;<br/>
+            &lt;div class=&quot;stat-item&quot;&gt;<br/>
+
+               &lt;div class=&quot;stat-header&quot;&gt;&lt;span&gt;SMARTS&lt;/span&gt;&lt;span
+id=&quot;smartsVal&quot;&gt;50%&lt;/span&gt;&lt;/div&gt;<br/>
+       
+        &lt;div class=&quot;bar-bg&quot;&gt;&lt;div id=&quot;smartsBar&quot;
+class=&quot;bar-fill&quot; style=&quot;width: 50%; background:
+var(--smarts-color);&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br/>
+         
+  &lt;/div&gt;<br/>
+            &lt;div class=&quot;stat-item&quot;&gt;<br/>
+
+               &lt;div class=&quot;stat-header&quot;&gt;&lt;span&gt;WEALTH&lt;/span&gt;&lt;span
+id=&quot;wealthVal&quot;&gt;0%&lt;/span&gt;&lt;/div&gt;<br/>
+        
+       &lt;div class=&quot;bar-bg&quot;&gt;&lt;div id=&quot;wealthBar&quot;
+class=&quot;bar-fill&quot; style=&quot;width: 0%; background:
+var(--wealth-color);&quot;&gt;&lt;/div&gt;&lt;/div&gt;<br/>
+         
+  &lt;/div&gt;<br/>
+        &lt;/div&gt;<br/>
+<br/>
+        &lt;!--
+Scrollable Life Feed --&gt;<br/>
+        &lt;div id=&quot;lifeFeed&quot;
+class=&quot;feed-container&quot;&gt;&lt;/div&gt;<br/>
+<br/>
+       
+&lt;!-- Main Action Buttons --&gt;<br/>
+        &lt;div
+class=&quot;action-panel&quot;&gt;<br/>
+            &lt;button
+class=&quot;btn btn-age&quot; onclick=&quot;ageUp()&quot;&gt;+ AGE UP
+(+1 Year)&lt;/button&gt;<br/>
+        &lt;/div&gt;<br/>
+    &lt;/div&gt;<br/>
+<br/>
+
+   &lt;!-- Choice Modal --&gt;<br/>
+    &lt;div id=&quot;choiceModal&quot;
+class=&quot;modal-overlay&quot;&gt;<br/>
+        &lt;div
+class=&quot;modal&quot;&gt;<br/>
+            &lt;div id=&quot;modalTitle&quot;
+class=&quot;modal-title&quot;&gt;Life Decision&lt;/div&gt;<br/>
+     
+      &lt;div id=&quot;modalDesc&quot; class=&quot;modal-desc&quot;&gt;What
+will you do?&lt;/div&gt;<br/>
+            &lt;div id=&quot;modalOpts&quot;
+class=&quot;modal-opts&quot;&gt;&lt;/div&gt;<br/>
+        &lt;/div&gt;<br/>
+
+   &lt;/div&gt;<br/>
+<br/>
+    &lt;script&gt;<br/>
+        const
+state = {<br/>
+            name: &quot;Alex Smith&quot;,<br/>
+       
+    age: 0,<br/>
+            bank: 0,<br/>
+            health: 100,<br/>
+
+           happiness: 100,<br/>
+            smarts: 50,<br/>
+        
+   job: null,<br/>
+            isDead: false<br/>
+        };<br/>
+<br/>
+
+       const avatars = { baby: &quot;👶&quot;, child: &quot;🧒&quot;,
+teen: &quot;🧑&quot;, adult: &quot;👨&quot;, senior: &quot;👨‍🦳&quot;
+};<br/>
+<br/>
+        function updateUI() {<br/>
+           
+document.getElementById('charSub').innerText = `Age ${state.age} •
+${getStage()}`;<br/>
+           
+document.getElementById('charBank').innerText =
+`$${state.bank.toLocaleString()}`;<br/>
+            <br/>
+           
+// Stats<br/>
+            ['health', 'happy', 'smarts'].forEach(s =&gt;
+{<br/>
+                const key = s === 'happy' ? 'happiness' : s;<br/>
+
+               document.getElementById(`${s}Val`).innerText =
+`${state[key]}%`;<br/>
+               
+document.getElementById(`${s}Bar`).style.width = `${state[key]}%`;<br/>
+
+           });<br/>
+<br/>
+            // Wealth Bar Scaling<br/>
+    
+       const wealthPct = Math.min(100, Math.floor((state.bank /
+100000) * 100));<br/>
+           
+document.getElementById('wealthVal').innerText = `${wealthPct}%`;<br/>
+
+           document.getElementById('wealthBar').style.width =
+`${wealthPct}%`;<br/>
+<br/>
+            // Avatar<br/>
+           
+let emoji = avatars.baby;<br/>
+            if (state.age &gt;= 60)
+emoji = avatars.senior;<br/>
+            else if (state.age &gt;= 18)
+emoji = avatars.adult;<br/>
+            else if (state.age &gt;= 12)
+emoji = avatars.teen;<br/>
+            else if (state.age &gt;= 5)
+emoji = avatars.child;<br/>
+           
+document.getElementById('avatar').innerText = emoji;<br/>
+        }<br/>
+<br/>
+
+       function getStage() {<br/>
+            if (state.age &gt;= 60)
+return &quot;Senior&quot;;<br/>
+            if (state.age &gt;= 18)
+return &quot;Adult&quot;;<br/>
+            if (state.age &gt;= 12)
+return &quot;Teen&quot;;<br/>
+            if (state.age &gt;= 5)
+return &quot;Child&quot;;<br/>
+            return &quot;Baby&quot;;<br/>
+
+       }<br/>
+<br/>
+        function addLog(text, isAge = false) {<br/>
+
+           const feed = document.getElementById('lifeFeed');<br/>
+   
+        const entry = document.createElement('div');<br/>
+           
+entry.className = `log-entry ${isAge ? 'age-up' : ''}`;<br/>
+        
+   entry.innerText = text;<br/>
+            feed.appendChild(entry);<br/>
+
+           feed.scrollTop = feed.scrollHeight;<br/>
+        }<br/>
+<br/>
+
+       function ageUp() {<br/>
+            if (state.isDead) return;<br/>
+
+           state.age++;<br/>
+            addLog(`Age ${state.age}:
+Another year passes.`, true);<br/>
+<br/>
+            // Job Income<br/>
+
+           if (state.job) {<br/>
+                state.bank +=
+state.job.salary;<br/>
+                addLog(`Earned
+$${state.job.salary.toLocaleString()} as a ${state.job.title}.`);<br/>
+
+           }<br/>
+<br/>
+            // Life Events<br/>
+           
+if (state.age === 6) {<br/>
+                triggerChoice(&quot;Elementary
+School&quot;, &quot;It's your first day of school!&quot;, [<br/>
+    
+               { label: &quot;Study hard&quot;, action: () =&gt; {
+state.smarts += 15; addLog(&quot;You studied hard and made good
+grades!&quot;); } },<br/>
+                    { label: &quot;Make
+friends&quot;, action: () =&gt; { state.happiness += 10; addLog(&quot;You
+focused on making friends.&quot;); } }<br/>
+                ]);<br/>
+
+           } else if (state.age === 18 &amp;&amp; !state.job) {<br/>
+
+               triggerChoice(&quot;Career Path&quot;, &quot;You
+graduated high school! Choose a path:&quot;, [<br/>
+                 
+  { label: &quot;Get a job as Fast Food Worker ($18k/yr)&quot;,
+action: () =&gt; { state.job = { title: &quot;Fast Food Worker&quot;,
+salary: 18000 }; } },<br/>
+                    { label: &quot;Go to
+College ($20k tuition, +Smarts)&quot;, action: () =&gt; {
+state.smarts += 30; state.bank -= 20000; state.job = { title:
+&quot;Software Engineer&quot;, salary: 85000 }; addLog(&quot;Graduated
+college and landed a tech job!&quot;); } }<br/>
+                ]);<br/>
+
+           }<br/>
+<br/>
+            // Check health<br/>
+           
+if (state.health &lt;= 0 || state.age &gt; 100) {<br/>
+              
+ state.isDead = true;<br/>
+                addLog(`🪦 You passed
+away peacefully at age ${state.age}. Final Wealth:
+$${state.bank.toLocaleString()}`);<br/>
+            }<br/>
+<br/>
+    
+       updateUI();<br/>
+        }<br/>
+<br/>
+        function
+triggerChoice(title, desc, options) {<br/>
+           
+document.getElementById('modalTitle').innerText = title;<br/>
+       
+    document.getElementById('modalDesc').innerText = desc;<br/>
+     
+      const container = document.getElementById('modalOpts');<br/>
+  
+         container.innerHTML = &quot;&quot;;<br/>
+<br/>
+           
+options.forEach(opt =&gt; {<br/>
+                const btn =
+document.createElement('button');<br/>
+                btn.className
+= &quot;opt-btn&quot;;<br/>
+                btn.innerText =
+opt.label;<br/>
+                btn.onclick = () =&gt; {<br/>
+       
+            opt.action();<br/>
+                   
+document.getElementById('choiceModal').classList.remove('active');<br/>
+
+                   updateUI();<br/>
+                };<br/>
+         
+      container.appendChild(btn);<br/>
+            });<br/>
+<br/>
+   
+       
+document.getElementById('choiceModal').classList.add('active');<br/>
+
+       }<br/>
+<br/>
+        // Initialize<br/>
+        addLog(&quot;Born
+into the world as Alex Smith.&quot;);<br/>
+        updateUI();<br/>
+ 
+  &lt;/script&gt;<br/>
+&lt;/body&gt;<br/>
+&lt;/html&gt;</p>
+</body>
+</html>

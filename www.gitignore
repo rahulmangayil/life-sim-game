@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Capacitor & Android Build Artifacts
+android/
+capacitor.config.json.user
+*.apk
+*.aab
+
+# OS System Files
+.DS_Store
+Thumbs.db
+
+# Environment & IDE
+.env
+.idea/
+.vscode/
+*.log
